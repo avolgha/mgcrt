@@ -38,5 +38,20 @@ init({
       ]),
       populate: () => {},
     },
+    {
+      path: "/testlazy",
+      template: element("p", {}, ["The secret was revealed: @"]),
+      populate: (element, data) => {
+        element.textContent = element.textContent.replace("@", data.secret);
+      },
+      loadingElement: element("p", {}, ["Loading..."]),
+      preload: () => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve({ secret: 42 });
+          }, 3000);
+        });
+      },
+    },
   ],
 });
