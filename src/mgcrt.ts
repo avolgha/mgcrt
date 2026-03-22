@@ -11,8 +11,7 @@ export interface InitOptions {
   container: HTMLElement;
   pages: Page[];
   settings?: {
-    // TODO: mabye make setting a filter function for more flexibility.
-    linkReload?: boolean;
+    linkReload?: boolean | ((path: string) => boolean);
   };
 }
 
@@ -76,7 +75,20 @@ export function findPage<PageData = never>(path: string) {
   throw _err(`could not find page. (path: '${path}')`);
 }
 
+export function checkPageReloadable(path: string) {
+  if (!window.mgcrtSettings?.linkReload)
+    throw _err("router was corrupted or not initialized.");
+  if (window.location.hash.substring(1) !== path) return true;
+  if (typeof window.mgcrtSettings?.linkReload === "boolean")
+    return window.mgcrtSettings.linkReload;
+  return window.mgcrtSettings?.linkReload(path);
+}
+
 export function init(options: InitOptions) {
+  if (window.mgcrtContainer) {
+    throw _err("there is already a mgcrt instance running.");
+  }
+
   if (!options.container) {
     throw _err("container element does not exists.");
   }
@@ -95,10 +107,7 @@ export function init(options: InitOptions) {
     if (!(event.target instanceof HTMLButtonElement)) return;
     if (!event.target.dataset.page) return;
     const nextPage = event.target.dataset.page;
-    if (
-      window.mgcrtSettings?.linkReload === false &&
-      nextPage === document.location.hash.substring(1)
-    ) {
+    if (!checkPageReloadable(nextPage)) {
       return;
     }
 
