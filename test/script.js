@@ -54,4 +54,7 @@ init({
       },
     },
   ],
+  settings: {
+    linkReload: false,
+  },
 });

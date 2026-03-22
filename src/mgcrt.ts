@@ -10,14 +10,31 @@ export interface Page<PreloadData = never> {
 export interface InitOptions {
   container: HTMLElement;
   pages: Page[];
+  settings?: {
+    // TODO: mabye make setting a filter function for more flexibility.
+    linkReload?: boolean;
+  };
 }
+
+export type Settings = Required<InitOptions["settings"]>;
+
+const defaultSettings: Settings = {
+  linkReload: true,
+};
 
 declare global {
   interface Window {
     mgcrtContainer: HTMLElement;
     mgcrtPages: Page[];
+    mgcrtSettings: Settings;
+  }
+
+  interface ObjectConstructor {
+    keys<T>(object: T): Array<keyof T>;
   }
 }
+
+// TODO: make links work completely case-insensitive.
 
 const _err = (message: string) => new Error(`mgcrt: ${message}`);
 
@@ -66,11 +83,26 @@ export function init(options: InitOptions) {
 
   window.mgcrtContainer = options.container;
   window.mgcrtPages = options.pages;
+  window.mgcrtSettings = defaultSettings;
+
+  if (options.settings) {
+    for (const key of Object.keys(options.settings)) {
+      window.mgcrtSettings![key] = options.settings[key]!;
+    }
+  }
 
   document.addEventListener("click", (event) => {
     if (!(event.target instanceof HTMLButtonElement)) return;
     if (!event.target.dataset.page) return;
-    const page = findPage(event.target.dataset.page);
+    const nextPage = event.target.dataset.page;
+    if (
+      window.mgcrtSettings?.linkReload === false &&
+      nextPage === document.location.hash.substring(1)
+    ) {
+      return;
+    }
+
+    const page = findPage(nextPage);
     if (page) loadPage(page);
   });
 
