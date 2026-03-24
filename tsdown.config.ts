@@ -6,11 +6,12 @@ function bannify(text: string) {
 }
 
 export default defineConfig({
+  entry: "./src/mgcrt.ts",
   banner: bannify(fs.readFileSync("./license", "utf-8")),
   clean: true,
   dts: true,
-  exports: true,
   minify: true,
   platform: "browser",
+  publint: true,
   sourcemap: true,
 });
