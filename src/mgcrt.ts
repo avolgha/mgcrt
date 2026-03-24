@@ -1,7 +1,5 @@
 import type { Page, Settings } from "./types";
 
-// TODO: make links work completely case-insensitive.
-
 declare global {
   interface Window {
     mgcrtContainer: HTMLElement;

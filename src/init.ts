@@ -21,7 +21,10 @@ export default function init(options: InitOptions) {
   }
 
   window.mgcrtContainer = options.container;
-  window.mgcrtPages = options.pages;
+  window.mgcrtPages = options.pages.map((page) => {
+    page.path = page.path.toLowerCase();
+    return page;
+  });
   window.mgcrtSettings = defaultSettings;
 
   if (options.settings) {

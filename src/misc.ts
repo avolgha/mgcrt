@@ -22,10 +22,8 @@ export function findPage<PageData = never>(path: string) {
   if (!window.mgcrtPages)
     throw new MgcrtError("router was corrupted or not initialized.");
 
-  path = path.toLowerCase();
-  if (path.startsWith("#")) path = path.substring(1);
-
-  const page = window.mgcrtPages.find((page) => page.path === path);
+  const realPath = path.toLowerCase().replace(/^#?/g, "");
+  const page = window.mgcrtPages.find((page) => page.path === realPath);
   if (page) return page as Page<PageData>;
 
   // TODO: add a 404 page/ component.
