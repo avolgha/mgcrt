@@ -1,25 +1,30 @@
 /**
  * structural representation of a page.
  */
-export interface Page<PreloadData = never> {
-  /**
-   * @deprecated currently not used.
-   */
-  name?: string;
-
+export interface Page<PreloadData = never> extends Component<PreloadData> {
   /**
    * the raw path to the page prefixed with a slash.
    */
   path: string;
+}
+
+/**
+ * structural representation of a component.
+ */
+export interface Component<PreloadData = never> {
+  /**
+   * the name of the component.
+   */
+  name: string;
 
   /**
-   * the template of the main page component.
+   * the template of the component.
    */
   template: HTMLElement;
 
   /**
    * perform actions on the element. should probably be used for inserting data
-   * into the page.
+   * into the component.
    *
    * @param element the template element which should be populated.
    * @param data preloaded data from the `preload` function if it exists.

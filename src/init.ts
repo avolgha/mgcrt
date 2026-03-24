@@ -1,4 +1,4 @@
-import loadPage from "./loadPage";
+import { loadPage } from "./load";
 import { checkPageReloadable, findPage, MgcrtError } from "./misc";
 import type { InitOptions, Settings } from "./types";
 

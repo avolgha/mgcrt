@@ -13,8 +13,8 @@ declare global {
 }
 
 export { default as init } from "./init";
-export { default as loadPage } from "./loadPage";
 
+export { loadPage, loadComponent } from "./load";
 export { MgcrtError, findPage, checkPageReloadable } from "./misc";
 export type { Page, Settings };
 export type { InitOptions } from "./types";
