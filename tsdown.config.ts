@@ -6,16 +6,11 @@ function bannify(text: string) {
 }
 
 export default defineConfig({
+  banner: bannify(fs.readFileSync("./license", "utf-8")),
+  clean: true,
   dts: true,
   exports: true,
-  devtools: true,
   minify: true,
-  clean: true,
-  sourcemap: true,
-  unused: true,
   platform: "browser",
-  attw: {
-    profile: "esm-only",
-  },
-  banner: bannify(fs.readFileSync("./license", "utf-8")),
+  sourcemap: true,
 });
