@@ -1,7 +1,7 @@
 {
   "name": "@avolgha/mgcrt",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "simple javascript router",
   "author": "avolgha <avolgha@gmail.com>",
   "license": "MIT",
