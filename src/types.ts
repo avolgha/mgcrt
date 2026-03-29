@@ -66,20 +66,33 @@ export interface InitOptions {
    * settings for the router. these settings can be used to change the default
    * behavior of the router.
    */
-  settings?: {
-    /**
-     * determines whether a reload should be performed when trying to navigate
-     * to a page you are currently already on.
-     *
-     * can be set to a constant value or a filter function which determines the
-     * result by the provided path.
-     */
-    linkReload?: boolean | ((path: string) => boolean);
-  };
+  settings?: Settings;
 }
 
 /**
  * settings for the router. these settings can be used to change the default
  * behavior of the router.
  */
-export type Settings = InitOptions["settings"];
+export type Settings = {
+  /**
+   * determines whether a reload should be performed when trying to navigate
+   * to a page you are currently already on.
+   *
+   * can be set to a constant value or a filter function which determines the
+   * result by the provided path.
+   */
+  linkReload?: boolean | ((path: string) => boolean);
+
+  /**
+   * determine whether a so called "404-page" should be shown when the user
+   * tries navigating to a page which is not registered within the router.
+   *
+   * if set to a boolean with value `true`, it will try to reroute to a page
+   * with the path `/404`.
+   *
+   * this behaviour can be alternated by passing in a string which results in
+   * the boolean to be automatically thought of as `true` but the route set
+   * to the provided string value.
+   */
+  notFoundPage?: boolean | string;
+};

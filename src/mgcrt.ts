@@ -4,7 +4,7 @@ declare global {
   interface Window {
     mgcrtContainer: HTMLElement;
     mgcrtPages: Page[];
-    mgcrtSettings: Settings;
+    mgcrtSettings: Readonly<Settings>;
   }
 
   interface ObjectConstructor {

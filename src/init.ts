@@ -3,7 +3,13 @@ import { checkPageReloadable, findPage, MgcrtError } from "./misc";
 import type { InitOptions, Settings } from "./types";
 
 const defaultSettings: Settings = {
+  // motivation: will only be triggered if user tries to load the same page
+  //             twice which is irrelevant in most cases.
   linkReload: false,
+
+  // motivation: we dont implement default pages thus the user has to explicitly
+  //             create one by himself. should be set to `true` in most cases.
+  notFoundPage: false,
 };
 
 /**
@@ -25,13 +31,9 @@ export default function init(options: InitOptions) {
     page.path = page.path.toLowerCase();
     return page;
   });
-  window.mgcrtSettings = defaultSettings;
-
-  if (options.settings) {
-    for (const key of Object.keys(options.settings)) {
-      window.mgcrtSettings![key] = options.settings[key]!;
-    }
-  }
+  window.mgcrtSettings = Object.freeze(
+    Object.create(defaultSettings, options.settings || {}),
+  );
 
   document.addEventListener("click", (event) => {
     if (!(event.target instanceof HTMLButtonElement)) return;

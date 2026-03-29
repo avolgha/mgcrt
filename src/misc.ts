@@ -16,9 +16,11 @@ export class MgcrtError extends Error {
  * if no page could be found, an error will be thrown.
  *
  * @param path the path of the page to find.
+ * @param skip404Error whether or not handling of a not found page should be
+ *                     skipped. (for internal use "only". default is `false`)
  * @returns the found page.
  */
-export function findPage<PageData = never>(path: string) {
+export function findPage<PageData = never>(path: string, skip404Error = false) {
   if (!window.mgcrtPages)
     throw new MgcrtError("router was corrupted or not initialized.");
 
@@ -26,8 +28,15 @@ export function findPage<PageData = never>(path: string) {
   const page = window.mgcrtPages.find((page) => page.path === realPath);
   if (page) return page as Page<PageData>;
 
-  // TODO: add a 404 page/ component.
-  throw new MgcrtError(`could not find page. (path: '${path}')`);
+  const notFoundPageSetting = window.mgcrtSettings?.notFoundPage;
+  if (notFoundPageSetting === undefined)
+    throw new MgcrtError("router was corrupted or not initialized.");
+  if (!notFoundPageSetting || skip404Error)
+    throw new MgcrtError(`could not find page. (path: '${path}')`);
+
+  const notFoundPage =
+    typeof notFoundPageSetting === "string" ? notFoundPageSetting : "/404";
+  return findPage(notFoundPage, true);
 }
 
 /**
