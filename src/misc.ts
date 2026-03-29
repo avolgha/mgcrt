@@ -46,7 +46,7 @@ export function findPage<PageData = never>(path: string) {
  * @returns whether a component reload should be performed.
  */
 export function checkPageReloadable(path: string) {
-  if (!window.mgcrtSettings?.linkReload)
+  if (window.mgcrtSettings?.linkReload === undefined)
     throw new MgcrtError("router was corrupted or not initialized.");
 
   if (window.location.hash.substring(1) !== path) return true;
