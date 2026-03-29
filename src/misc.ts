@@ -12,6 +12,13 @@ export class MgcrtError extends Error {
 }
 
 /**
+ * utility function to create a template error when the router should but was
+ * not initialized when trying to call functions of that router.
+ */
+export const errorNotInit = () =>
+  new MgcrtError("router was corrupted or not initialized.");
+
+/**
  * tries to find a page matching the specified path in the router definitions.
  * if no page could be found, an error will be thrown.
  *
@@ -21,16 +28,14 @@ export class MgcrtError extends Error {
  * @returns the found page.
  */
 export function findPage<PageData = never>(path: string, skip404Error = false) {
-  if (!window.mgcrtPages)
-    throw new MgcrtError("router was corrupted or not initialized.");
+  if (!window.mgcrtPages) throw errorNotInit();
 
   const realPath = path.toLowerCase().replace(/^#?/g, "");
   const page = window.mgcrtPages.find((page) => page.path === realPath);
   if (page) return page as Page<PageData>;
 
   const notFoundPageSetting = window.mgcrtSettings?.notFoundPage;
-  if (notFoundPageSetting === undefined)
-    throw new MgcrtError("router was corrupted or not initialized.");
+  if (notFoundPageSetting === undefined) throw errorNotInit();
   if (!notFoundPageSetting || skip404Error)
     throw new MgcrtError(`could not find page. (path: '${path}')`);
 
@@ -55,13 +60,9 @@ export function findPage<PageData = never>(path: string, skip404Error = false) {
  * @returns whether a component reload should be performed.
  */
 export function checkPageReloadable(path: string) {
-  if (window.mgcrtSettings?.linkReload === undefined)
-    throw new MgcrtError("router was corrupted or not initialized.");
-
-  if (window.location.hash.substring(1) !== path) return true;
-
-  if (typeof window.mgcrtSettings?.linkReload === "boolean")
+  if (window.mgcrtSettings?.linkReload === undefined) throw errorNotInit();
+  else if (window.location.hash.substring(1) !== path) return true;
+  else if (typeof window.mgcrtSettings?.linkReload === "boolean")
     return window.mgcrtSettings.linkReload;
-
-  return window.mgcrtSettings?.linkReload(path);
+  else return window.mgcrtSettings?.linkReload(path);
 }

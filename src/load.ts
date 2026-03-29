@@ -1,4 +1,4 @@
-import { MgcrtError } from "./misc";
+import { errorNotInit, MgcrtError } from "./misc";
 import type { Component, Page } from "./types";
 
 /**
@@ -11,9 +11,7 @@ import type { Component, Page } from "./types";
  * @see loadComponent
  */
 export const loadPage = <PageData = never>(page: Page<PageData>) => {
-  if (!window.mgcrtContainer) {
-    throw new MgcrtError("router was corrupted or not initialized.");
-  }
+  if (!window.mgcrtContainer) throw errorNotInit();
 
   loadComponent(window.mgcrtContainer, page, () => {
     document.location.hash = page.path;
