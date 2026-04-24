@@ -1,4 +1,4 @@
-import { init } from "./mgcrt.js";
+import { link } from "./node_modules/@avolgha/mgcrt/dist/helper.js";
 
 const container = document.getElementById("app");
 if (!container) throw new Error();

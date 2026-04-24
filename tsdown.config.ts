@@ -1,12 +1,11 @@
-import { defineConfig } from "tsdown";
+import { defineConfig, UserConfig } from "tsdown";
 import fs from "node:fs";
 
 function bannify(text: string) {
   return `/*\n * ${text.trim().split("\n").join("\n * ")}\n */`;
 }
 
-export default defineConfig({
-  entry: "./src/mgcrt.ts",
+const templateConfig: Partial<UserConfig> = {
   banner: bannify(fs.readFileSync("./license", "utf-8")),
   clean: true,
   dts: true,
@@ -14,4 +13,15 @@ export default defineConfig({
   platform: "browser",
   publint: true,
   sourcemap: true,
-});
+};
+
+export default defineConfig([
+  {
+    ...templateConfig,
+    entry: "./src/mgcrt.ts",
+  },
+  {
+    ...templateConfig,
+    entry: "./src/helper.ts",
+  },
+]);

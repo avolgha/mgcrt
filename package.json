@@ -18,6 +18,10 @@
       "types": "./dist/mgcrt.d.ts",
       "default": "./dist/mgcrt.js"
     },
+    "./helper": {
+      "types": "./dist/helper.d.ts",
+      "default": "./dist/helper.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
