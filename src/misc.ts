@@ -3,12 +3,22 @@ import type { Page } from "./types";
 /**
  * the default error thrown by mgcrt.
  *
- * prefixes all error messages with a `mgcrt:`.
+ * prefixes all error messages with a `mgcrt: `.
  */
 export class MgcrtError extends Error {
   constructor(message: string) {
     super(`mgcrt: ${message}`);
   }
+}
+
+/**
+ * if while pre-loading a component an instance of this class is returned by
+ * the promise, the router will try to redirect the user to the specified path.
+ *
+ * @see loadComponent
+ */
+export class MgcrtRedirect {
+  constructor(public path: string) {}
 }
 
 /**

@@ -1,4 +1,4 @@
-import { errorNotInit, MgcrtError } from "./misc";
+import { errorNotInit, findPage, MgcrtError, MgcrtRedirect } from "./misc";
 import type { Component, Page } from "./types";
 
 /**
@@ -40,7 +40,7 @@ export function loadComponent<ComponentData = never>(
 
   if (!component.loadingElement) {
     const template = document.importNode(component.template, true);
-    component.populate(template);
+    component.populate && component.populate(template);
     container.replaceChildren(template);
     onFinish && onFinish();
     return;
@@ -55,8 +55,14 @@ export function loadComponent<ComponentData = never>(
   container.replaceChildren(component.loadingElement);
   component.preload().then((data) => {
     const template = document.importNode(component.template, true);
-    component.populate(template, data);
+    component.populate && component.populate(template, data);
     container.replaceChildren(template);
     onFinish && onFinish();
+  }).catch((reason) => {
+    if (reason instanceof MgcrtRedirect) {
+      loadPage(findPage(reason.path));
+    } else {
+      throw new Error(`preloading component '${component.name}' failed with`, reason);
+    }
   });
 }

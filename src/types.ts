@@ -29,12 +29,12 @@ export interface Component<PreloadData = never> {
    * @param element the template element which should be populated.
    * @param data preloaded data from the `preload` function if it exists.
    */
-  populate(element: Node, data?: PreloadData): void;
+  populate?(element: Node, data?: PreloadData): void;
 
   /**
    * an element which is to be shown while the `preload` function is running.
    */
-  loadingElement?: HTMLElement;
+  loadingElement?: HTMLElement | null;
 
   /**
    * preload data for the page before it is shown. the returned data will be
@@ -60,7 +60,7 @@ export interface InitOptions {
   /**
    * the pages to be registered with the router.
    */
-  pages: Page[];
+  pages: Page<unknown>[];
 
   /**
    * settings for the router. these settings can be used to change the default
@@ -73,7 +73,7 @@ export interface InitOptions {
  * settings for the router. these settings can be used to change the default
  * behavior of the router.
  */
-export type Settings = {
+export interface Settings {
   /**
    * determines whether a reload should be performed when trying to navigate
    * to a page you are currently already on.
@@ -95,4 +95,4 @@ export type Settings = {
    * to the provided string value.
    */
   notFoundPage?: boolean | string;
-};
+}
