@@ -32,7 +32,7 @@ export default function init(options: InitOptions) {
     return page;
   });
   window.mgcrtSettings = Object.freeze(
-    Object.create(defaultSettings, options.settings || {}),
+    Object.assign(Object.create(defaultSettings), options.settings || {}),
   );
 
   document.addEventListener("click", (event) => {

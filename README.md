@@ -2,6 +2,11 @@
 
 Simple JavaScript SPA router implementation.
 
+> [!NOTE]
+> as mentioned, this project aims to only support single-page applications.
+> this also means, that for example SSR (server side rendering) will not be
+> supported and is no goal for the future.
+
 ## Usage
 
 ```html
