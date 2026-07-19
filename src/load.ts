@@ -10,7 +10,7 @@ import type { Component, Page } from "./types";
  * @param page the page object that should be loaded.
  * @see loadComponent
  */
-export const loadPage = <PageData = never>(page: Page<PageData>) => {
+export function loadPage<PageData = never>(page: Page<PageData>) {
   if (!window.mgcrtContainer) throw errorNotInit();
 
   loadComponent(window.mgcrtContainer, page, () => {
@@ -34,6 +34,10 @@ export function loadComponent<ComponentData = never>(
   component: Component<ComponentData>,
   onFinish?: () => void,
 ) {
+  if (!container) {
+    throw new MgcrtError("cannot load component without container element.");
+  }
+
   if (!component.loadingElement) {
     const template = document.importNode(component.template, true);
     component.populate(template);
