@@ -62,11 +62,11 @@ export function findPage<PageData = never>(path: string, skip404Error = false) {
  *
  * @see PreloadMiddleware
  */
-export const createPage = <PreloadData = never>(options: {
+export const createPage = <SharedContext = never, PreloadData = never>(options: {
   path: string;
   template: HTMLElement;
-  populate?(element: HTMLElement, data?: PreloadData): void;
-  preloadMiddleware?: PreloadMiddleware<PreloadData>;
+  populate?: Page<SharedContext, PreloadData>["populate"];
+  preloadMiddleware?: PreloadMiddleware<SharedContext, PreloadData>;
 }) => ({
   path: options.path,
   name: `page:${options.path}`,
@@ -78,7 +78,7 @@ export const createPage = <PreloadData = never>(options: {
   preload: options.preloadMiddleware
     ? options.preloadMiddleware.preload
     : undefined,
-} satisfies Page<PreloadData>);
+} satisfies Page<SharedContext, PreloadData>);
 
 /**
  * checks if when navigating to a new page, the page should be reloaded or not.
