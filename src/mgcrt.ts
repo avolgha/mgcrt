@@ -15,6 +15,6 @@ declare global {
 export { default as init } from "./init";
 
 export { loadPage, loadComponent } from "./load";
-export { MgcrtError, MgcrtRedirect, findPage, checkPageReloadable } from "./misc";
+export { MgcrtError, MgcrtRedirect, findPage, createPage, checkPageReloadable } from "./misc";
 export type { Page, Settings };
-export type { Component, InitOptions } from "./types";
+export type { Component, PreloadMiddleware, InitOptions } from "./types";

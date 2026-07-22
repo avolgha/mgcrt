@@ -38,7 +38,7 @@ export function loadComponent<ComponentData = never>(
     throw new MgcrtError("cannot load component without container element.");
   }
 
-  if (!component.loadingElement) {
+  if (component.loadingElement === undefined) {
     const template = document.importNode(component.template, true);
     component.populate && component.populate(template);
     container.replaceChildren(template);
@@ -52,7 +52,7 @@ export function loadComponent<ComponentData = never>(
     );
   }
 
-  container.replaceChildren(component.loadingElement);
+  component.loadingElement && container.replaceChildren(component.loadingElement);
   component.preload().then((data) => {
     const template = document.importNode(component.template, true);
     component.populate && component.populate(template, data);

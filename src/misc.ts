@@ -1,4 +1,4 @@
-import type { Page } from "./types";
+import type { Page, PreloadMiddleware } from "./types";
 
 /**
  * the default error thrown by mgcrt.
@@ -53,6 +53,32 @@ export function findPage<PageData = never>(path: string, skip404Error = false) {
     typeof notFoundPageSetting === "string" ? notFoundPageSetting : "/404";
   return findPage(notFoundPage, true);
 }
+
+/**
+ * helper for creating a page object.
+ *
+ * we encourage to use this function as it does not give much options to the
+ * user and makes using preload middleware simpler.
+ *
+ * @see PreloadMiddleware
+ */
+export const createPage = <PreloadData = never>(options: {
+  path: string;
+  template: HTMLElement;
+  populate?(element: HTMLElement, data?: PreloadData): void;
+  preloadMiddleware?: PreloadMiddleware<PreloadData>;
+}) => ({
+  path: options.path,
+  name: `page:${options.path}`,
+  template: options.template,
+  populate: options.populate,
+  loadingElement: options.preloadMiddleware
+    ? options.preloadMiddleware.loadingElement
+    : undefined,
+  preload: options.preloadMiddleware
+    ? options.preloadMiddleware.preload
+    : undefined,
+} satisfies Page<PreloadData>);
 
 /**
  * checks if when navigating to a new page, the page should be reloaded or not.

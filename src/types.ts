@@ -49,6 +49,34 @@ export interface Component<PreloadData = never> {
 }
 
 /**
+ * structural representation of a middleware component such that pages can
+ * reuse their preloading logic without needing to add it to every page itself.
+ *
+ * possible application would be authentication-guards, where the user will be
+ * redirected to a login page when no login is found.
+ *
+ * @see createPage
+ * @see Component
+ */
+export interface PreloadMiddleware<PreloadData = never> {
+  /**
+   * an element which is to be shown while the `preload` function is running.
+   */
+  loadingElement: Component["loadingElement"];
+
+  /**
+   * preload data for the page before it is shown. the returned data will be
+   * passed to the `populate` function.
+   *
+   * the function will only be called if there is a `loadingElement` defined.
+   *
+   * @returns a promise which resolves to the data to be passed to the
+   *          `populate` function.
+   */
+  preload: NonNullable<Component<PreloadData>["preload"]>;
+}
+
+/**
  * options for the `init` function of the mgcrt router.
  */
 export interface InitOptions {
