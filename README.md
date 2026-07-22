@@ -1,7 +1,7 @@
 > [!CAUTION]
 > this is just a feature branch. do not use this in production!
 >
-> the idea for this branch is described in [IDEA.txt](IDEA.txt).
+> the idea for this branch is described in [IDEA.md](IDEA.md).
 
 # mgcrt
 
