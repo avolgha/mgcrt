@@ -1,3 +1,8 @@
+> [!CAUTION]
+> this is just a feature branch. do not use this in production!
+>
+> the idea for this branch is described in [IDEA.txt](IDEA.txt).
+
 # mgcrt
 
 Simple JavaScript SPA router implementation.
@@ -9,38 +14,8 @@ Simple JavaScript SPA router implementation.
 
 ## Usage
 
-```html
-<div class="links">
-  <button data-page="/">Page 1</button>
-  <button data-page="/page2">Page 2</button>
-</div>
-
-<div id="root"></div>
-
-<script type="module" src="..."></script>
-```
-
-```javascript
-import { init as initMgcrt } from "./mgcrt.js";
-
-initMgcrt({
-  container: document.getElementById("root"),
-  pages: [
-    {
-      path: "/",
-      template: document.createTextNode("Hello World from Page 1!"),
-      populate: () => {},
-    },
-    {
-      path: "/page2",
-      template: document.createTextNode("Hello World from @!"),
-      populate: (element) => {
-        element.textContent = element.textContent.replace("@", "Page 2");
-      },
-    },
-  ],
-});
-```
+<!-- TODO -->
+`TBD`
 
 ## Build it yourself
 
