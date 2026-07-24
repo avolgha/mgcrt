@@ -35,18 +35,23 @@ export default function init<SharedContext = never>(options: InitOptions<SharedC
     Object.assign(Object.create(defaultSettings), options.settings || {}),
   );
 
-  const baseContext = Object.create(options.initialContext || {}) as SharedContext;
-
-  document.addEventListener("click", (event) => {
-    if (!(event.target instanceof HTMLButtonElement)) return;
-    if (!event.target.dataset.page) return;
-    const nextPage = event.target.dataset.page;
+  window.mgcrtNavigate = function(nextPage: string) {
     if (!checkPageReloadable(nextPage)) {
       return;
     }
 
     const page = findPage(nextPage);
     if (page) loadPage(page, baseContext);
+  };
+
+  const baseContext = Object.create(options.initialContext || {}) as SharedContext;
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof HTMLButtonElement)) return;
+    if (!event.target.dataset.page) return;
+    const nextPage = event.target.dataset.page;
+
+    window.mgcrtNavigate(nextPage);
   });
 
   loadPage(findPage(document.location.hash || "/"), baseContext);
