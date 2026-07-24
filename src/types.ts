@@ -1,7 +1,7 @@
 /**
  * structural representation of a page.
  */
-export interface Page<PreloadData = never> extends Component<PreloadData> {
+export interface Page<SharedContext = never, PreloadData = never> extends Component<SharedContext, PreloadData> {
   /**
    * the raw path to the page prefixed with a slash.
    */
@@ -11,7 +11,7 @@ export interface Page<PreloadData = never> extends Component<PreloadData> {
 /**
  * structural representation of a component.
  */
-export interface Component<PreloadData = never> {
+export interface Component<SharedContext = never, PreloadData = never> {
   /**
    * the name of the component.
    */
@@ -29,7 +29,7 @@ export interface Component<PreloadData = never> {
    * @param element the template element which should be populated.
    * @param data preloaded data from the `preload` function if it exists.
    */
-  populate?(element: Node, data?: PreloadData): void;
+  populate?(element: Node, context: SharedContext, data?: PreloadData): void;
 
   /**
    * an element which is to be shown while the `preload` function is running.
@@ -45,7 +45,7 @@ export interface Component<PreloadData = never> {
    * @returns a promise which resolves to the data to be passed to the
    *          `populate` function.
    */
-  preload?(): Promise<PreloadData>;
+  preload?(context: SharedContext): Promise<PreloadData>;
 }
 
 /**
@@ -58,7 +58,7 @@ export interface Component<PreloadData = never> {
  * @see createPage
  * @see Component
  */
-export interface PreloadMiddleware<PreloadData = never> {
+export interface PreloadMiddleware<SharedContext = never, PreloadData = never> {
   /**
    * an element which is to be shown while the `preload` function is running.
    */
@@ -73,13 +73,13 @@ export interface PreloadMiddleware<PreloadData = never> {
    * @returns a promise which resolves to the data to be passed to the
    *          `populate` function.
    */
-  preload: NonNullable<Component<PreloadData>["preload"]>;
+  preload: NonNullable<Component<SharedContext, PreloadData>["preload"]>;
 }
 
 /**
  * options for the `init` function of the mgcrt router.
  */
-export interface InitOptions {
+export interface InitOptions<SharedContext = never> {
   /**
    * the main containing element for the router.
    */
@@ -88,13 +88,19 @@ export interface InitOptions {
   /**
    * the pages to be registered with the router.
    */
-  pages: Page<unknown>[];
+  pages: Page<SharedContext, unknown>[];
 
   /**
    * settings for the router. these settings can be used to change the default
    * behavior of the router.
    */
   settings?: Settings;
+
+  /**
+   * the context that is immediately available without modifications by the
+   * pages.
+   */
+  initialContext?: SharedContext;
 }
 
 /**

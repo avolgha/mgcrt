@@ -3,7 +3,8 @@ import type { Page, Settings } from "./types";
 declare global {
   interface Window {
     mgcrtContainer: HTMLElement;
-    mgcrtPages: Page<unknown>[];
+    mgcrtNavigate(nextPage: string): void;
+    mgcrtPages: Page<unknown, unknown>[];
     mgcrtSettings: Readonly<Settings>;
   }
 
