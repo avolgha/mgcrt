@@ -1,7 +1,7 @@
 /**
  * structural representation of a page.
  */
-export interface Page<PreloadData = never> extends Component<PreloadData> {
+export interface Page<SharedContext = never, PreloadData = never> extends Component<SharedContext, PreloadData> {
   /**
    * the raw path to the page prefixed with a slash.
    */
@@ -11,7 +11,7 @@ export interface Page<PreloadData = never> extends Component<PreloadData> {
 /**
  * structural representation of a component.
  */
-export interface Component<PreloadData = never> {
+export interface Component<SharedContext = never, PreloadData = never> {
   /**
    * the name of the component.
    */
@@ -29,12 +29,12 @@ export interface Component<PreloadData = never> {
    * @param element the template element which should be populated.
    * @param data preloaded data from the `preload` function if it exists.
    */
-  populate(element: Node, data?: PreloadData): void;
+  populate?(element: Node, context: SharedContext, data?: PreloadData): void;
 
   /**
    * an element which is to be shown while the `preload` function is running.
    */
-  loadingElement?: HTMLElement;
+  loadingElement?: HTMLElement | null;
 
   /**
    * preload data for the page before it is shown. the returned data will be
@@ -45,13 +45,41 @@ export interface Component<PreloadData = never> {
    * @returns a promise which resolves to the data to be passed to the
    *          `populate` function.
    */
-  preload?(): Promise<PreloadData>;
+  preload?(context: SharedContext): Promise<PreloadData>;
+}
+
+/**
+ * structural representation of a middleware component such that pages can
+ * reuse their preloading logic without needing to add it to every page itself.
+ *
+ * possible application would be authentication-guards, where the user will be
+ * redirected to a login page when no login is found.
+ *
+ * @see createPage
+ * @see Component
+ */
+export interface PreloadMiddleware<SharedContext = never, PreloadData = never> {
+  /**
+   * an element which is to be shown while the `preload` function is running.
+   */
+  loadingElement: Component["loadingElement"];
+
+  /**
+   * preload data for the page before it is shown. the returned data will be
+   * passed to the `populate` function.
+   *
+   * the function will only be called if there is a `loadingElement` defined.
+   *
+   * @returns a promise which resolves to the data to be passed to the
+   *          `populate` function.
+   */
+  preload: NonNullable<Component<SharedContext, PreloadData>["preload"]>;
 }
 
 /**
  * options for the `init` function of the mgcrt router.
  */
-export interface InitOptions {
+export interface InitOptions<SharedContext = never> {
   /**
    * the main containing element for the router.
    */
@@ -60,20 +88,26 @@ export interface InitOptions {
   /**
    * the pages to be registered with the router.
    */
-  pages: Page[];
+  pages: Page<SharedContext, unknown>[];
 
   /**
    * settings for the router. these settings can be used to change the default
    * behavior of the router.
    */
   settings?: Settings;
+
+  /**
+   * the context that is immediately available without modifications by the
+   * pages.
+   */
+  initialContext?: SharedContext;
 }
 
 /**
  * settings for the router. these settings can be used to change the default
  * behavior of the router.
  */
-export type Settings = {
+export interface Settings {
   /**
    * determines whether a reload should be performed when trying to navigate
    * to a page you are currently already on.
@@ -95,4 +129,4 @@ export type Settings = {
    * to the provided string value.
    */
   notFoundPage?: boolean | string;
-};
+}

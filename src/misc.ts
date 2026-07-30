@@ -1,14 +1,24 @@
-import type { Page } from "./types";
+import type { Page, PreloadMiddleware } from "./types";
 
 /**
  * the default error thrown by mgcrt.
  *
- * prefixes all error messages with a `mgcrt:`.
+ * prefixes all error messages with a `mgcrt: `.
  */
 export class MgcrtError extends Error {
   constructor(message: string) {
     super(`mgcrt: ${message}`);
   }
+}
+
+/**
+ * if while pre-loading a component an instance of this class is returned by
+ * the promise, the router will try to redirect the user to the specified path.
+ *
+ * @see loadComponent
+ */
+export class MgcrtRedirect {
+  constructor(public path: string) {}
 }
 
 /**
@@ -43,6 +53,32 @@ export function findPage<PageData = never>(path: string, skip404Error = false) {
     typeof notFoundPageSetting === "string" ? notFoundPageSetting : "/404";
   return findPage(notFoundPage, true);
 }
+
+/**
+ * helper for creating a page object.
+ *
+ * we encourage to use this function as it does not give much options to the
+ * user and makes using preload middleware simpler.
+ *
+ * @see PreloadMiddleware
+ */
+export const createPage = <SharedContext = never, PreloadData = never>(options: {
+  path: string;
+  template: HTMLElement;
+  populate?: Page<SharedContext, PreloadData>["populate"];
+  preloadMiddleware?: PreloadMiddleware<SharedContext, PreloadData>;
+}) => ({
+  path: options.path,
+  name: `page:${options.path}`,
+  template: options.template,
+  populate: options.populate,
+  loadingElement: options.preloadMiddleware
+    ? options.preloadMiddleware.loadingElement
+    : undefined,
+  preload: options.preloadMiddleware
+    ? options.preloadMiddleware.preload
+    : undefined,
+} satisfies Page<SharedContext, PreloadData>);
 
 /**
  * checks if when navigating to a new page, the page should be reloaded or not.

@@ -3,7 +3,8 @@ import type { Page, Settings } from "./types";
 declare global {
   interface Window {
     mgcrtContainer: HTMLElement;
-    mgcrtPages: Page[];
+    mgcrtNavigate(nextPage: string): void;
+    mgcrtPages: Page<unknown, unknown>[];
     mgcrtSettings: Readonly<Settings>;
   }
 
@@ -15,6 +16,6 @@ declare global {
 export { default as init } from "./init";
 
 export { loadPage, loadComponent } from "./load";
-export { MgcrtError, findPage, checkPageReloadable } from "./misc";
+export { MgcrtError, MgcrtRedirect, findPage, createPage, checkPageReloadable } from "./misc";
 export type { Page, Settings };
-export type { InitOptions } from "./types";
+export type { Component, PreloadMiddleware, InitOptions } from "./types";

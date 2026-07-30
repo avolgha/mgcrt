@@ -1,4 +1,4 @@
-import { errorNotInit, MgcrtError } from "./misc";
+import { errorNotInit, findPage, MgcrtError, MgcrtRedirect } from "./misc";
 import type { Component, Page } from "./types";
 
 /**
@@ -10,10 +10,13 @@ import type { Component, Page } from "./types";
  * @param page the page object that should be loaded.
  * @see loadComponent
  */
-export const loadPage = <PageData = never>(page: Page<PageData>) => {
+export function loadPage<SharedContext = never, PageData = never>(
+  page: Page<SharedContext, PageData>,
+  context: SharedContext
+) {
   if (!window.mgcrtContainer) throw errorNotInit();
 
-  loadComponent(window.mgcrtContainer, page, () => {
+  loadComponent(window.mgcrtContainer, page, context, () => {
     document.location.hash = page.path;
   });
 };
@@ -29,14 +32,19 @@ export const loadPage = <PageData = never>(page: Page<PageData>) => {
  * @param component the component you want to add to the container.
  * @param onFinish an event function for when the component is fully loaded.
  */
-export function loadComponent<ComponentData = never>(
+export function loadComponent<SharedContext = never, ComponentData = never>(
   container: HTMLElement,
-  component: Component<ComponentData>,
+  component: Component<SharedContext, ComponentData>,
+  context: SharedContext,
   onFinish?: () => void,
 ) {
-  if (!component.loadingElement) {
+  if (!container) {
+    throw new MgcrtError("cannot load component without container element.");
+  }
+
+  if (component.loadingElement === undefined) {
     const template = document.importNode(component.template, true);
-    component.populate(template);
+    component.populate && component.populate(template, context);
     container.replaceChildren(template);
     onFinish && onFinish();
     return;
@@ -48,11 +56,17 @@ export function loadComponent<ComponentData = never>(
     );
   }
 
-  container.replaceChildren(component.loadingElement);
-  component.preload().then((data) => {
+  component.loadingElement && container.replaceChildren(component.loadingElement);
+  component.preload(context).then((data) => {
     const template = document.importNode(component.template, true);
-    component.populate(template, data);
+    component.populate && component.populate(template, context, data);
     container.replaceChildren(template);
     onFinish && onFinish();
+  }).catch((reason) => {
+    if (reason instanceof MgcrtRedirect) {
+      loadPage<SharedContext & { error_notFound: MgcrtRedirect }, ComponentData>(findPage(reason.path), Object.assign(context, { error_notFound: reason }));
+    } else {
+      throw new Error(`preloading component '${component.name}' failed with`, reason);
+    }
   });
 }

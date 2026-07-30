@@ -17,7 +17,7 @@ const defaultSettings: Settings = {
  *
  * @param options configuration of the router
  */
-export default function init(options: InitOptions) {
+export default function init<SharedContext = never>(options: InitOptions<SharedContext>) {
   if (window.mgcrtContainer) {
     throw new MgcrtError("there is already a mgcrt instance running.");
   }
@@ -32,20 +32,27 @@ export default function init(options: InitOptions) {
     return page;
   });
   window.mgcrtSettings = Object.freeze(
-    Object.create(defaultSettings, options.settings || {}),
+    Object.assign(Object.create(defaultSettings), options.settings || {}),
   );
 
-  document.addEventListener("click", (event) => {
-    if (!(event.target instanceof HTMLButtonElement)) return;
-    if (!event.target.dataset.page) return;
-    const nextPage = event.target.dataset.page;
+  window.mgcrtNavigate = function(nextPage: string) {
     if (!checkPageReloadable(nextPage)) {
       return;
     }
 
     const page = findPage(nextPage);
-    if (page) loadPage(page);
+    if (page) loadPage(page, baseContext);
+  };
+
+  const baseContext = Object.create(options.initialContext || {}) as SharedContext;
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof HTMLButtonElement)) return;
+    if (!event.target.dataset.page) return;
+    const nextPage = event.target.dataset.page;
+
+    window.mgcrtNavigate(nextPage);
   });
 
-  loadPage(findPage(document.location.hash || "/"));
+  loadPage(findPage(document.location.hash || "/"), baseContext);
 }
