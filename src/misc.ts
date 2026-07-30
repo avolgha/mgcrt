@@ -37,12 +37,15 @@ export const errorNotInit = () =>
  *                     skipped. (for internal use "only". default is `false`)
  * @returns the found page.
  */
-export function findPage<PageData = never>(path: string, skip404Error = false) {
+export function findPage<SharedContext = never, PageData = never>(
+  path: string,
+  skip404Error = false,
+) {
   if (!window.mgcrtPages) throw errorNotInit();
 
   const realPath = path.toLowerCase().replace(/^#?/g, "");
-  const page = window.mgcrtPages.find((page) => page.path === realPath);
-  if (page) return page as Page<PageData>;
+  const node = window.mgcrtPages.getNode(realPath);
+  if (node && node.own) return node.own as Page<SharedContext, PageData>;
 
   const notFoundPageSetting = window.mgcrtSettings?.notFoundPage;
   if (notFoundPageSetting === undefined) throw errorNotInit();
@@ -62,23 +65,27 @@ export function findPage<PageData = never>(path: string, skip404Error = false) {
  *
  * @see PreloadMiddleware
  */
-export const createPage = <SharedContext = never, PreloadData = never>(options: {
+export const createPage = <
+  SharedContext = never,
+  PreloadData = never,
+>(options: {
   path: string;
   template: HTMLElement;
   populate?: Page<SharedContext, PreloadData>["populate"];
   preloadMiddleware?: PreloadMiddleware<SharedContext, PreloadData>;
-}) => ({
-  path: options.path,
-  name: `page:${options.path}`,
-  template: options.template,
-  populate: options.populate,
-  loadingElement: options.preloadMiddleware
-    ? options.preloadMiddleware.loadingElement
-    : undefined,
-  preload: options.preloadMiddleware
-    ? options.preloadMiddleware.preload
-    : undefined,
-} satisfies Page<SharedContext, PreloadData>);
+}) =>
+  ({
+    path: options.path,
+    name: `page:${options.path}`,
+    template: options.template,
+    populate: options.populate,
+    loadingElement: options.preloadMiddleware
+      ? options.preloadMiddleware.loadingElement
+      : undefined,
+    preload: options.preloadMiddleware
+      ? options.preloadMiddleware.preload
+      : undefined,
+  }) satisfies Page<SharedContext, PreloadData>;
 
 /**
  * checks if when navigating to a new page, the page should be reloaded or not.

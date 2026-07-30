@@ -12,14 +12,14 @@ import type { Component, Page } from "./types";
  */
 export function loadPage<SharedContext = never, PageData = never>(
   page: Page<SharedContext, PageData>,
-  context: SharedContext
+  context: SharedContext,
 ) {
   if (!window.mgcrtContainer) throw errorNotInit();
 
   loadComponent(window.mgcrtContainer, page, context, () => {
     document.location.hash = page.path;
   });
-};
+}
 
 /**
  * load a component into a container.
@@ -56,17 +56,31 @@ export function loadComponent<SharedContext = never, ComponentData = never>(
     );
   }
 
-  component.loadingElement && container.replaceChildren(component.loadingElement);
-  component.preload(context).then((data) => {
-    const template = document.importNode(component.template, true);
-    component.populate && component.populate(template, context, data);
-    container.replaceChildren(template);
-    onFinish && onFinish();
-  }).catch((reason) => {
-    if (reason instanceof MgcrtRedirect) {
-      loadPage<SharedContext & { error_notFound: MgcrtRedirect }, ComponentData>(findPage(reason.path), Object.assign(context, { error_notFound: reason }));
-    } else {
-      throw new Error(`preloading component '${component.name}' failed with`, reason);
-    }
-  });
+  component.loadingElement &&
+    container.replaceChildren(component.loadingElement);
+  component
+    .preload(context)
+    .then((data) => {
+      const template = document.importNode(component.template, true);
+      component.populate && component.populate(template, context, data);
+      container.replaceChildren(template);
+      onFinish && onFinish();
+    })
+    .catch((reason) => {
+      if (reason instanceof MgcrtRedirect) {
+        loadPage<
+          SharedContext & { error_notFound: MgcrtRedirect },
+          ComponentData
+        >(
+          findPage(reason.path),
+          // @ts-expect-error -- type was decleared in generic but is not registered yet here
+          Object.assign(context, { error_notFound: reason }),
+        );
+      } else {
+        throw new Error(
+          `preloading component '${component.name}' failed with`,
+          reason,
+        );
+      }
+    });
 }

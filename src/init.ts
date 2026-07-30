@@ -1,5 +1,6 @@
 import { loadPage } from "./load";
 import { checkPageReloadable, findPage, MgcrtError } from "./misc";
+import { Pages } from "./pages";
 import type { InitOptions, Settings } from "./types";
 
 const defaultSettings: Settings = {
@@ -17,7 +18,9 @@ const defaultSettings: Settings = {
  *
  * @param options configuration of the router
  */
-export default function init<SharedContext = never>(options: InitOptions<SharedContext>) {
+export default function init<SharedContext = never>(
+  options: InitOptions<SharedContext>,
+) {
   if (window.mgcrtContainer) {
     throw new MgcrtError("there is already a mgcrt instance running.");
   }
@@ -27,15 +30,12 @@ export default function init<SharedContext = never>(options: InitOptions<SharedC
   }
 
   window.mgcrtContainer = options.container;
-  window.mgcrtPages = options.pages.map((page) => {
-    page.path = page.path.toLowerCase();
-    return page;
-  });
+  window.mgcrtPages = new Pages(options.pages);
   window.mgcrtSettings = Object.freeze(
     Object.assign(Object.create(defaultSettings), options.settings || {}),
   );
 
-  window.mgcrtNavigate = function(nextPage: string) {
+  window.mgcrtNavigate = function (nextPage: string) {
     if (!checkPageReloadable(nextPage)) {
       return;
     }
@@ -44,7 +44,9 @@ export default function init<SharedContext = never>(options: InitOptions<SharedC
     if (page) loadPage(page, baseContext);
   };
 
-  const baseContext = Object.create(options.initialContext || {}) as SharedContext;
+  const baseContext = Object.create(
+    options.initialContext || {},
+  ) as SharedContext;
 
   document.addEventListener("click", (event) => {
     if (!(event.target instanceof HTMLButtonElement)) return;

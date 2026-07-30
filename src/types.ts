@@ -1,7 +1,10 @@
 /**
  * structural representation of a page.
  */
-export interface Page<SharedContext = never, PreloadData = never> extends Component<SharedContext, PreloadData> {
+export interface Page<
+  SharedContext = never,
+  PreloadData = never,
+> extends Component<SharedContext, PreloadData> {
   /**
    * the raw path to the page prefixed with a slash.
    */
