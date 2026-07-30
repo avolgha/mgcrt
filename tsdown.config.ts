@@ -1,4 +1,4 @@
-import { defineConfig, UserConfig } from "tsdown";
+import { defineConfig, type UserConfig } from "tsdown";
 import fs from "node:fs";
 
 function bannify(text: string) {
